@@ -1,7 +1,8 @@
 from litellm import completion
 import os
+from dotenv import load_dotenv
 
-os.environ["GEMINI_API_KEY"] = "AIzaSyCsGl_MjnKvY2Z7Lyf33CZfRaSndyiXLsQ"
+load_dotenv()
 
 messages = [{ "content": "Hello, how are you?","role": "user"}]
 
