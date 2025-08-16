@@ -3,3 +3,4 @@ __pycache__/
 .claude
 .venv
 .vscode
+.chroma_db
