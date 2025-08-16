@@ -2,7 +2,6 @@ import chromadb
 from chromadb.config import Settings
 from .embeddings_example import create_embeddings
 from .chunking_example import fixed_size_chunking
-from .distance_calculations import cosine_similarity
 
 def setup_chromadb():
     """Initialize ChromaDB client and collection."""
@@ -16,8 +15,27 @@ def setup_chromadb():
     
     return client, collection
 
-def add_documents_to_db(collection, documents: list[str]):
-    """Chunk documents and add to ChromaDB with embeddings."""
+def add_document_to_db(collection, document: str, doc_id: int):
+    """Chunk single document and add to ChromaDB with embeddings."""
+    # Chunk the document
+    chunks = fixed_size_chunking(document, chunk_size=100, overlap=20)
+    
+    for chunk_id, chunk in enumerate(chunks):
+        # Create embedding for this chunk
+        embedding = create_embeddings([chunk])['embedding'][0]
+        
+        # Add to ChromaDB
+        collection.add(
+            documents=[chunk],
+            embeddings=[embedding],
+            ids=[f"doc_{doc_id}_chunk_{chunk_id}"],
+            metadatas=[{"doc_id": doc_id}]
+        )
+    
+    print(f"Added {len(chunks)} chunks from document {doc_id}")
+
+def add_documents_to_db_batch(collection, documents: list[str]):
+    """Batch add multiple documents to ChromaDB with embeddings."""
     all_chunks = []
     chunk_ids = []
     
@@ -42,6 +60,11 @@ def add_documents_to_db(collection, documents: list[str]):
     )
     
     print(f"Added {len(all_chunks)} chunks to database")
+
+def add_documents_to_db(collection, documents: list[str]):
+    """Add documents using loop instead of batch."""
+    for doc_id, document in enumerate(documents):
+        add_document_to_db(collection, document, doc_id)
 
 def search_documents(collection, query: str, n_results: int = 3):
     """Search for similar documents using embeddings."""
