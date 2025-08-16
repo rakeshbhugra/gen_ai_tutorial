@@ -2,3 +2,4 @@ retell-sdk
 dotenv
 streamlit
 litellm
+chromadb
