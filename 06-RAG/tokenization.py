@@ -54,3 +54,29 @@ if __name__ == "__main__":
     print("Token breakdown:")
     for i, (token_id, decoded) in enumerate(zip(complex_result['token_ids'], complex_result['decoded_tokens'])):
         print(f"  {i+1:2d}: ID={token_id:5d} -> '{decoded}'")
+
+        
+'''
+Subword Tokenization Methods:
+  - BPE (Byte Pair Encoding) - Used by GPT models, merges frequent character pairs
+  - WordPiece - Used by BERT, similar to BPE but different merging strategy
+  - SentencePiece - Used by T5, Gemini - works directly on raw text bytes
+  - Unigram - Statistical approach used by some models
+
+  Different Vocabularies:
+  - GPT-4: ~100k tokens with cl100k_base encoding
+  - BERT: ~30k tokens with WordPiece
+  - Gemini: Uses SentencePiece with different vocabulary size
+
+  Same text, different tokens:
+  "Hello world" might become:
+  - GPT: [9906, 1917]
+  - BERT: [7592, 2088]
+  - Gemini: [8421, 1076]
+
+  Why this matters for RAG:
+  - Token limits vary (GPT-4: 8k/32k, Gemini: 1M+)
+  - Embedding models need matching tokenization
+  - Cross-model compatibility requires careful handling
+  - Text splitting strategies must account for each tokenizer's behavior
+'''
