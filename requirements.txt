@@ -3,3 +3,4 @@ dotenv
 streamlit
 litellm
 chromadb
+python-docx
