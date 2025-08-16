@@ -1,7 +1,7 @@
 import chromadb
 from chromadb.config import Settings
 from .embeddings_example import create_embeddings
-from .chunking_example import semantic_chunking
+from .chunking_example import fixed_size_chunking
 from .distance_calculations import cosine_similarity
 
 def setup_chromadb():
@@ -23,7 +23,7 @@ def add_documents_to_db(collection, documents: list[str]):
     
     for doc_id, document in enumerate(documents):
         # Chunk the document
-        chunks = semantic_chunking(document, max_chunk_size=200)
+        chunks = fixed_size_chunking(document, chunk_size=100, overlap=20)
         
         for chunk_id, chunk in enumerate(chunks):
             all_chunks.append(chunk)
