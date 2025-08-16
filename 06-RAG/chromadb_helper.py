@@ -5,7 +5,10 @@ from .chunking_helper import fixed_size_chunking
 
 def setup_chromadb():
     """Initialize ChromaDB client and collection."""
-    client = chromadb.Client(Settings(persist_directory="./chroma_db"))
+    client = chromadb.Client(Settings(
+        persist_directory="./chroma_db",
+        is_persistent=True
+    ))
     
     # Create or get collection
     collection = client.get_or_create_collection(
@@ -125,7 +128,7 @@ if __name__ == "__main__":
 scrape.py example usage:
 from .chromadb_helper import setup_chromadb
 from .chunking_helper import fixed_size_chunking
-from .embeddings_example import create_embeddings
+from .embeddings_helper import create_embeddings
 from docx import Document
 
 client, collection = setup_chromadb()
