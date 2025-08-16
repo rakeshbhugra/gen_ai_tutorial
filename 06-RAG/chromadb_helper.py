@@ -1,7 +1,7 @@
 import chromadb
 from chromadb.config import Settings
-from .embeddings_example import create_embeddings
-from .chunking_example import fixed_size_chunking
+from .embeddings_helper import create_embeddings
+from .chunking_helper import fixed_size_chunking
 
 def setup_chromadb():
     """Initialize ChromaDB client and collection."""
@@ -119,3 +119,59 @@ if __name__ == "__main__":
         for i, (doc, distance) in enumerate(zip(results['documents'][0], results['distances'][0])):
             print(f"Result {i+1} (distance: {distance:.3f}):")
             print(f"  {doc[:100]}...")
+
+
+'''
+scrape.py example usage:
+from .chromadb_helper import setup_chromadb
+from .chunking_helper import fixed_size_chunking
+from .embeddings_example import create_embeddings
+from docx import Document
+
+client, collection = setup_chromadb()
+
+
+# Load the .docx file
+file_path = 'data_files/Capabl Sales Playbook.docx'
+doc = Document(file_path)
+
+full_text = '\n'.join(para.text for para in doc.paragraphs)
+
+print(full_text[:400])
+
+chunks = fixed_size_chunking(
+    full_text,
+    chunk_size=100,
+    overlap=20
+)
+
+# print(f"Number of chunks: {len(chunks)}")
+# print(f"First chunk: {chunks[0]}")
+
+for chunk_id, chunk in enumerate(chunks):
+    embedding = create_embeddings(chunk)
+    embedding_vector = embedding['embedding']
+
+    collection.add(
+        documents=[chunk],
+        embeddings=[embedding_vector],
+        ids=[f"doc_1_chunk_{chunk_id}"],
+        metadatas=[{"doc_id": 1}]
+    )
+
+print(f"Added {len(chunks)} chunks from the document to ChromaDB.")
+
+query = "What is your mission?"
+
+results = collection.query(
+    query_embeddings=[create_embeddings(query)['embedding']],
+    n_results=3,
+    include=["documents", "metadatas"]
+)
+
+for result in results['documents'][0]:
+    print(f"Document: {result}")
+    print(f"Metadata: {results['metadatas'][0][results['documents'][0].index(result)]}")
+    print("-" * 40)
+
+'''
