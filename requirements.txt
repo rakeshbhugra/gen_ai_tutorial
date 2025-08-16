@@ -4,3 +4,4 @@ streamlit
 litellm
 chromadb
 python-docx
+google-generativeai
