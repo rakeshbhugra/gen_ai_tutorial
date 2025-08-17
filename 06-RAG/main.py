@@ -5,17 +5,7 @@ from helper import (
     add_chunk_to_chromadb
 )
 
-
-# Worklow:
-# Read the document - done
-# Chunking the document text - done
-# Creating embeddings for the chunk - done
-# Adding the emebddings to the chromdb collection - done
-
-if __name__ == "__main__":
-    document_path = "data_files/Capabl Customer Support Guide.docx"
-    document_name = "Support Guide"
-    
+def add_document_to_chromadb(document_path, document_name):
     document = read_document(document_path)
 
     chunks = chunk_document(document)
@@ -28,3 +18,17 @@ if __name__ == "__main__":
         print("-"*40)
 
     print("Your document has been successfully processed and added to ChromaDB.")
+        
+
+# Worklow:
+# Read the document - done
+# Chunking the document text - done
+# Creating embeddings for the chunk - done
+# Adding the emebddings to the chromdb collection - done
+
+if __name__ == "__main__":
+    document_path = "data_files/Capabl Customer Support Guide.docx"
+    document_name = "Support Guide"
+
+    add_document_to_chromadb(document_path, document_name)
+    
