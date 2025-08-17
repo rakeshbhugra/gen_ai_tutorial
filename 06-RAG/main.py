@@ -12,7 +12,7 @@ def find_similar_chunks(embeddings):
     _, collection = setup_chromadb()
     results = collection.query(
         query_embeddings=[embeddings],
-        n_results=5
+        n_results=2
     )
     return [x for x in results['documents'][0]]
     
