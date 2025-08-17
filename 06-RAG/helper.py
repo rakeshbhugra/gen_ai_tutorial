@@ -1,5 +1,6 @@
 import docx
 from chunking_helper import fixed_size_chunking
+from embeddings_helper import create_embeddings
 
 print("you are importing the helper.py file")
 
@@ -37,3 +38,7 @@ def chunk_document(document_text):
     )
 
     return chunks
+
+def create_embeddings_of_chunk(chunk):
+    embeddings = create_embeddings(chunk)
+    return embeddings['embedding']
