@@ -1,5 +1,5 @@
 import numpy as np
-from .embeddings_example import create_embeddings
+from embeddings_helper import create_embeddings
 
 def cosine_similarity(vec1, vec2):
     """
@@ -130,7 +130,7 @@ if __name__ == "__main__":
 '''
 example usage in scrape.py
 import numpy as np
-from .embeddings_example import create_embeddings
+from embeddings_helper import create_embeddings
 from .distance_calculations import cosine_similarity
 
 sentence1 = "How do I get my money back?"
