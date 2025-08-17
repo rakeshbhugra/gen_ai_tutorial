@@ -1,13 +1,13 @@
 import chromadb
 from chromadb.config import Settings
-from .embeddings_helper import create_embeddings
-from .chunking_helper import fixed_size_chunking
+from embeddings_helper import create_embeddings
+from chunking_helper import fixed_size_chunking
 
 def setup_chromadb():
     """Initialize ChromaDB client and collection."""
     client = chromadb.Client(Settings(
         persist_directory="./chroma_db",
-        is_persistent=True
+        is_persistent=True,
     ))
     
     # Create or get collection
