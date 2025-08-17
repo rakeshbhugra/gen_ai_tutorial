@@ -1,6 +1,7 @@
 import docx
 from chunking_helper import fixed_size_chunking
 from embeddings_helper import create_embeddings
+from chromadb_helper import setup_chromadb
 
 print("you are importing the helper.py file")
 
@@ -42,3 +43,14 @@ def chunk_document(document_text):
 def create_embeddings_of_chunk(chunk):
     embeddings = create_embeddings(chunk)
     return embeddings['embedding']
+
+def add_chunk_to_chromadb(chunk, embeddings, document_name, chunk_index):
+    _, collection = setup_chromadb()
+    collection.add(
+        documents=[chunk],
+        embeddings=[embeddings],
+        ids=[f"{document_name}_chunk_{chunk_index}"],
+        metadatas=[{"doc_name": document_name}]
+    )
+
+    return True
