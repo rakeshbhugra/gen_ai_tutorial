@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-def get_llm_response(messages):
+def get_llm_response_from_messages(messages):
     response = completion(
         messages=messages,
         model="gemini/gemini-1.5-flash"
@@ -20,5 +20,5 @@ if __name__ == "__main__":
     user_query = "What is the process for handling customer complaints?"
     messages.append({"role": "user", "content": user_query})
 
-    response = get_llm_response(messages)
+    response = get_llm_response_from_messages(messages)
     print("LLM Response:", response)
