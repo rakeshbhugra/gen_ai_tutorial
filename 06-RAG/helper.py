@@ -1,4 +1,5 @@
 import docx
+from chunking_helper import fixed_size_chunking
 
 print("you are importing the helper.py file")
 
@@ -28,3 +29,11 @@ def read_document(document_path):
         full_text += para.text + "\n"
     return full_text
     
+def chunk_document(document_text):
+    chunks = fixed_size_chunking(
+        text=document_text,
+        chunk_size=100,
+        overlap=20
+    )
+
+    return chunks
