@@ -3,7 +3,11 @@ from chunking_helper import fixed_size_chunking
 from embeddings_helper import create_embeddings
 from chromadb_helper import setup_chromadb
 
-print("you are importing the helper.py file")
+# Worklow:
+# Read the document - done
+# Chunking the document text - done
+# Creating embeddings for the chunk - done
+# Adding the emebddings to the chromdb collection - done
 
 # Read the document
 def read_document(document_path):
@@ -54,3 +58,18 @@ def add_chunk_to_chromadb(chunk, embeddings, document_name, chunk_index):
     )
 
     return True
+
+def add_document_to_chromadb(document_path, document_name):
+    document = read_document(document_path)
+
+    chunks = chunk_document(document)
+
+    for idx, chunk in enumerate(chunks):
+        # print(chunk)
+        embeddings = create_embeddings_of_chunk(chunk)
+        add_chunk_to_chromadb(chunk, embeddings, document_name, idx)
+        print(f"Chunk: {chunk[:50]}...\nAdded to ChromaDB with ID: {document_name}_chunk_{idx}\n")
+        print("-"*40)
+
+    print("Your document has been successfully processed and added to ChromaDB.")
+        
