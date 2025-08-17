@@ -73,3 +73,15 @@ def add_document_to_chromadb(document_path, document_name):
 
     print("Your document has been successfully processed and added to ChromaDB.")
         
+def find_similar_chunks(query):
+    # create query embedding
+    embeddings = create_embeddings(query)['embedding']
+
+    # Find similar chunks using vector search in our chromadb collection
+    _, collection = setup_chromadb()
+    results = collection.query(
+        query_embeddings=[embeddings],
+        n_results=2
+    )
+
+    return [x for x in results['documents'][0]]
