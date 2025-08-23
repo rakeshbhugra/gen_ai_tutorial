@@ -1,3 +1,6 @@
+import litellm
+import json
+
 # LiteLLM Tool Calling Exercise - 3 New Functions and Test Queries
 
 def calculate_tip(bill_amount: float, tip_percentage: float = 15.0) -> dict:
@@ -146,3 +149,73 @@ COMPLEX QUERIES (multiple tools):
 - "Check if 'MyTip20%' is a strong password, then calculate tip for $50 with 20%"
 - "Calculate my BMI for 80kg and 180cm, then check password strength of 'Healthy123!'"
 """
+
+tools = [
+    {"type": "function", "function": litellm.utils.function_to_dict(calculate_tip)},
+    {"type": "function", "function": litellm.utils.function_to_dict(check_password_strength)},
+    {"type": "function", "function": litellm.utils.function_to_dict(calculate_bmi)}
+]
+
+# for tool in tools:
+#     print(json.dumps(tool, indent=2))
+#     print("-"*40)
+
+function_map = {
+    "calculate_tip": calculate_tip,
+    "check_password_strength": check_password_strength,
+    "calculate_bmi": calculate_bmi
+}
+
+queries = [
+    "Calculate the tip for a $85 bill with 20% tip",
+    "How strong is this password: 'MyP@ssw0rd2024'?"
+]
+
+
+for query in queries:
+    print(f"\n=== Query: {query} ===")
+    messages = [{"role": "user", "content": query}]
+
+    response = litellm.completion(
+        model="openai/gpt-4.1-mini",
+        messages=messages,
+        tools=tools,
+        tool_choice="auto"
+    )
+
+    response_message = response.choices[0].message
+    # print(f"Model response: {response_message}")
+
+    # Check if model wants to call a function
+    if response_message.tool_calls:
+        tool_call = response_message.tool_calls[0]
+        function_name = tool_call.function.name
+        function_args = json.loads(tool_call.function.arguments)
+        
+        print(f"\nFunction called: {function_name}")
+        print(f"Arguments: {function_args}")
+        
+        # Execute the function
+        if function_name in function_map:
+            result = function_map[function_name](**function_args)
+            # print(f"Function result: {result}")
+            
+            # Send function result back to model
+            messages.append({
+                "role": "assistant",
+                "content": response_message.content,
+                "tool_calls": response_message.tool_calls
+            })
+            messages.append({
+                "role": "tool",
+                "tool_call_id": tool_call.id,
+                "content": str(result)
+            })
+            
+            # Get final response
+            final_response = litellm.completion(
+                model="openai/gpt-4.1-mini",
+                messages=messages
+            )
+            
+            print(f"\nFinal response: {final_response.choices[0].message.content}")
