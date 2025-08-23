@@ -99,3 +99,16 @@ if email:
 
 else:
     print("Failed to parse email.")
+
+########################################
+########### Example Problem ############
+########################################
+
+'''
+Write a function that takes in user prompt and a pydantic model to get meeting details
+for example: meeting title, date, time 
+'''
+
+user_message = """
+Hey there, can you help me schedule a meeting with the design team on 2025-03-15 at 3 PM?
+"""
