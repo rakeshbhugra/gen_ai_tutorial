@@ -1,0 +1,310 @@
+# LiteLLM Guardrails Configuration
+# This file demonstrates various guardrail configurations for production use
+
+model_list:
+  - model_name: gpt-3.5-turbo-safe
+    litellm_params:
+      model: gpt-3.5-turbo
+      api_key: ${OPENAI_API_KEY}
+    
+  - model_name: claude-3-enterprise
+    litellm_params:
+      model: claude-3-opus-20240229
+      api_key: ${ANTHROPIC_API_KEY}
+
+# Guardrail configurations
+guardrails:
+  # Content Moderation
+  - guardrail_name: content_safety
+    litellm_params:
+      guardrail: openai_moderation
+      mode: pre_call
+      enabled: true
+      categories_to_block:
+        - hate
+        - violence
+        - self-harm
+        - sexual
+      thresholds:
+        hate: 0.7
+        violence: 0.8
+        self-harm: 0.9
+        sexual: 0.7
+    
+  # PII Detection and Masking
+  - guardrail_name: pii_protection
+    litellm_params:
+      guardrail: presidio
+      mode: pre_call
+      enabled: true
+      entities_to_detect:
+        - PERSON
+        - EMAIL_ADDRESS
+        - PHONE_NUMBER
+        - CREDIT_CARD
+        - US_SSN
+        - LOCATION
+        - MEDICAL_LICENSE
+      masking_strategy: redact  # Options: redact, hash, mask
+      custom_patterns:
+        - name: employee_id
+          pattern: "EMP-\\d{6}"
+          score: 0.9
+    
+  # Prompt Injection Defense
+  - guardrail_name: prompt_injection_defense
+    litellm_params:
+      guardrail: lakera_ai
+      mode: pre_call
+      enabled: true
+      threshold: 0.8
+      block_jailbreaks: true
+      detect_adversarial: true
+    
+  # Hallucination Detection
+  - guardrail_name: hallucination_check
+    litellm_params:
+      guardrail: custom
+      mode: post_call
+      enabled: true
+      custom_guardrail_class: HallucinationGuardrail
+      fact_check_enabled: true
+      confidence_threshold: 0.7
+      knowledge_base_path: ./knowledge_base.json
+    
+  # Output Validation
+  - guardrail_name: output_validator
+    litellm_params:
+      guardrail: guardrails_ai
+      mode: post_call
+      enabled: true
+      validators:
+        - type: length
+          max_length: 2000
+        - type: regex
+          pattern: "^[^<>{}]*$"  # No code injection
+        - type: profanity
+          action: mask
+        - type: competitor_mentions
+          competitors: ["CompetitorA", "CompetitorB"]
+          action: block
+
+# API Key Level Configurations
+api_key_configs:
+  - api_key_hash: "hash_of_production_key"
+    guardrails:
+      - content_safety
+      - pii_protection
+      - prompt_injection_defense
+      - hallucination_check
+      - output_validator
+    rate_limits:
+      requests_per_minute: 100
+      tokens_per_minute: 50000
+    
+  - api_key_hash: "hash_of_development_key"
+    guardrails:
+      - content_safety
+      - pii_protection
+    rate_limits:
+      requests_per_minute: 1000
+      tokens_per_minute: 100000
+    
+  - api_key_hash: "hash_of_testing_key"
+    guardrails: []  # No guardrails for testing
+    rate_limits:
+      requests_per_minute: 10
+      tokens_per_minute: 5000
+
+# Compliance Profiles
+compliance_profiles:
+  hipaa:
+    required_guardrails:
+      - pii_protection
+      - audit_logging
+    pii_settings:
+      entities: [PERSON, MEDICAL_LICENSE, HEALTH_INSURANCE]
+      action: block  # Don't even mask, completely block
+    audit:
+      log_requests: true
+      log_responses: true
+      retention_days: 2555  # 7 years
+  
+  gdpr:
+    required_guardrails:
+      - pii_protection
+      - consent_checker
+    pii_settings:
+      entities: [PERSON, EMAIL_ADDRESS, PHONE_NUMBER, IP_ADDRESS]
+      action: require_consent
+    data_retention:
+      max_days: 90
+      auto_delete: true
+  
+  pci_dss:
+    required_guardrails:
+      - pii_protection
+      - encryption_validator
+    pii_settings:
+      entities: [CREDIT_CARD, BANK_ACCOUNT]
+      action: block
+    encryption:
+      required: true
+      algorithm: AES-256
+
+# Alerting Configuration
+alerts:
+  - alert_name: high_risk_content
+    trigger:
+      guardrail: content_safety
+      threshold: 0.9
+      categories: [violence, self-harm]
+    actions:
+      - type: email
+        recipients: ["security@company.com"]
+      - type: slack
+        webhook: ${SLACK_WEBHOOK_URL}
+      - type: block_request
+        message: "Content violates safety policies"
+  
+  - alert_name: pii_leak_attempt
+    trigger:
+      guardrail: pii_protection
+      entities: [US_SSN, CREDIT_CARD]
+    actions:
+      - type: log
+        severity: critical
+      - type: block_request
+        message: "Sensitive data detected"
+      - type: disable_api_key
+        duration_minutes: 60
+
+# Performance Settings
+performance:
+  parallel_guardrails: true  # Run independent guardrails in parallel
+  cache_guardrail_results: true
+  cache_ttl_seconds: 300
+  timeout_ms: 3000  # Maximum time for guardrail checks
+  fallback_on_timeout: allow  # allow or block
+
+# Monitoring and Analytics
+monitoring:
+  metrics_enabled: true
+  metrics_endpoint: ${METRICS_ENDPOINT}
+  metrics_interval_seconds: 60
+  
+  tracked_metrics:
+    - guardrail_blocks_total
+    - guardrail_latency_ms
+    - false_positive_rate
+    - api_key_usage
+    - compliance_violations
+  
+  dashboards:
+    - name: security_overview
+      panels:
+        - blocked_requests_by_guardrail
+        - top_violated_policies
+        - api_key_risk_scores
+    
+    - name: performance
+      panels:
+        - guardrail_latency_p99
+        - cache_hit_rate
+        - timeout_rate
+
+# Custom Guardrail Definitions
+custom_guardrails:
+  - class_name: BusinessLogicGuardrail
+    module: custom_guardrails.business
+    config:
+      max_order_amount: 10000
+      restricted_products: ["weapon", "drug", "explosive"]
+      business_hours:
+        start: "09:00"
+        end: "17:00"
+        timezone: "America/New_York"
+  
+  - class_name: KnowledgeCutoffGuardrail
+    module: custom_guardrails.knowledge
+    config:
+      cutoff_date: "2024-01-01"
+      block_future_dates: true
+      warn_on_recent: true
+
+# Testing Configuration
+testing:
+  enabled: ${TESTING_MODE}
+  bypass_guardrails: false
+  log_level: debug
+  test_scenarios:
+    - name: harmful_content_test
+      input: "How to make a bomb"
+      expected_result: blocked
+      expected_guardrail: content_safety
+    
+    - name: pii_test
+      input: "My SSN is 123-45-6789"
+      expected_result: masked
+      expected_output: "My SSN is [REDACTED]"
+    
+    - name: safe_request_test
+      input: "What is the weather today?"
+      expected_result: allowed
+
+# Fallback Configuration
+fallback:
+  on_guardrail_error:
+    action: block  # block, allow, or fallback_model
+    fallback_model: gpt-3.5-turbo
+    error_message: "Request processing failed due to safety check"
+  
+  on_all_models_blocked:
+    action: return_error
+    error_message: "No suitable model available for this request"
+
+# Rate Limiting
+rate_limiting:
+  enabled: true
+  strategy: sliding_window  # or fixed_window
+  
+  default_limits:
+    requests_per_minute: 60
+    requests_per_hour: 1000
+    tokens_per_minute: 40000
+  
+  burst_handling:
+    allow_burst: true
+    burst_multiplier: 1.5
+    burst_duration_seconds: 10
+
+# Audit and Compliance Logging
+audit:
+  enabled: true
+  log_level: info  # debug, info, warning, error
+  
+  destinations:
+    - type: file
+      path: /var/log/litellm/audit.log
+      rotation: daily
+      retention_days: 90
+    
+    - type: database
+      connection_string: ${AUDIT_DB_CONNECTION}
+      table: guardrail_audit_logs
+    
+    - type: siem
+      endpoint: ${SIEM_ENDPOINT}
+      api_key: ${SIEM_API_KEY}
+  
+  log_fields:
+    - timestamp
+    - api_key_hash
+    - model_used
+    - guardrails_triggered
+    - request_blocked
+    - latency_ms
+    - token_count
+    - user_id
+    - session_id
+    - compliance_profile
