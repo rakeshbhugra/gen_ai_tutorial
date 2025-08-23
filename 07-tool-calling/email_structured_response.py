@@ -41,6 +41,8 @@ to_email = raw_response.split("To:")[1].split("Subject:")[0].strip()
 subject = raw_response.split("Subject:")[1].split("Body:")[0].strip()
 body = raw_response.split("Body:")[1].strip()
 
+print(f"To: {to_email}\nSubject: {subject}\nBody: {body}s")
+
 # send_email(
 #     to=to_email,
 #     subject=subject,
