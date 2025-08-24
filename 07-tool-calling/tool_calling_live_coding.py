@@ -98,15 +98,11 @@ while True:
 
     if response_message.tool_calls:
 
-        turn_to_be_appended = {
+        conversation_history.append({
             "role": "assistant",
             "content": response_message.content,
-        }
-
-        if response_message.tool_calls:
-            turn_to_be_appended["tool_calls"] = response_message.tool_calls
-
-        conversation_history.append(turn_to_be_appended)
+            "tool_calls": response_message.tool_calls
+        })
         
         for tool_call in response_message.tool_calls:
             function_name = tool_call.function.name
@@ -133,11 +129,14 @@ while True:
             messages=conversation_history
         ) 
         print(f"\nAI:\n------\n {final_response.choices[0].message.content}")
+        conversation_history.append({
+            "role": "assistant",
+            "content": final_response.choices[0].message.content
+        })
                 
     else:
-        if response_message.content not in ["", None]:
-            conversation_history.append({
-                "role": "assistant",
-                "content": response_message.content
-            })
+        conversation_history.append({
+            "role": "assistant",
+            "content": response_message.content
+        })
         print(f"\nAI:\n------\n {response_message.content}")
