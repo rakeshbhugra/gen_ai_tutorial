@@ -102,8 +102,7 @@ if response_message.tool_calls:
         "tool_calls": response_message.tool_calls
     })
     
-    for tool in response_message.tool_calls:
-        tool_call = tool
+    for tool_call in response_message.tool_calls:
         function_name = tool_call.function.name
         function_args = json.loads(tool_call.function.arguments)
 
