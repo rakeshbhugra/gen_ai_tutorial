@@ -80,7 +80,7 @@ system_prompt = "You are a helpful assistant that can perform basic arithmetic o
 
 conversation_history.append({"role": "system", "content": system_prompt})
 
-user_query = "What is 25 + 37 and 30*40?"
+user_query = "What is 25 + 37 and 30 / 5?"
 
 conversation_history.append({"role": "user", "content": user_query})
 
@@ -95,18 +95,39 @@ response_message = response.choices[0].message
 # print(f"Model response: {response_message}")
 
 if response_message.tool_calls:
+
+    conversation_history.append({
+        "role": "assistant",
+        "content": response_message.content,
+        "tool_calls": response_message.tool_calls
+    })
+    
     for tool in response_message.tool_calls:
         tool_call = tool
         function_name = tool_call.function.name
         function_args = json.loads(tool_call.function.arguments)
 
-        print(f"\nFunction called: {function_name}")
-        print(f"Arguments: {function_args}")
+        # print(f"\nFunction called: {function_name}")
+        # print(f"Arguments: {function_args}")
 
         if function_name in function_map:
             result = function_map[function_name](**function_args)
-            print(f"Function result: {result}")
+            # print(f"Function result: {result}")
+
+            conversation_history.append({
+                "role": "tool",
+                "tool_call_id": tool_call.id,
+                "content": str(result)
+            })
+
         else:
             raise ValueError(f"Function {function_name} not found in function_map")
+        
+        final_response = litellm.completion(
+            model="gemini/gemini-2.5-flash-lite",
+            messages=conversation_history
+        ) 
+        print(f"\nFinal response: {final_response.choices[0].message.content}")
+            
 else:
     print(response_message.content)
