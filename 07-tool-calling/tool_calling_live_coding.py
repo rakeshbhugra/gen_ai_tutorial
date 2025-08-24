@@ -1,5 +1,8 @@
 import litellm
 import json
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def sum_numbers(a, b):
     """Add two numbers together and return the sum
@@ -82,7 +85,7 @@ user_query = "What is 25 + 37?"
 conversation_history.append({"role": "user", "content": user_query})
 
 response = litellm.completion(
-    model="openai/gpt-4.1-mini",
+    model="gemini/gemini-2.5-flash-lite",
     messages=conversation_history,
     tools=tools,
     tool_choice="auto"
@@ -98,4 +101,11 @@ if response_message.tool_calls:
 
     print(f"\nFunction called: {function_name}")
     print(f"Arguments: {function_args}")
+
+    if function_name in function_map:
+        result = function_map[function_name](**function_args)
+        print(f"Function result: {result}")
+    else:
+        raise ValueError(f"Function {function_name} not found in function_map")
+        
 
