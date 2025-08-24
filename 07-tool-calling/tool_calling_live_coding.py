@@ -122,11 +122,11 @@ if response_message.tool_calls:
         else:
             raise ValueError(f"Function {function_name} not found in function_map")
         
-        final_response = litellm.completion(
-            model="gemini/gemini-2.5-flash-lite",
-            messages=conversation_history
-        ) 
-        print(f"\nFinal response: {final_response.choices[0].message.content}")
+    final_response = litellm.completion(
+        model="gemini/gemini-2.5-flash-lite",
+        messages=conversation_history
+    ) 
+    print(f"\nFinal response:\n------\n {final_response.choices[0].message.content}")
             
 else:
     print(response_message.content)
