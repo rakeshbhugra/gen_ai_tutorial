@@ -80,7 +80,7 @@ system_prompt = "You are a helpful assistant that can perform basic arithmetic o
 
 conversation_history.append({"role": "system", "content": system_prompt})
 
-user_query = "What is 25 + 37?"
+user_query = "What is 25 - 37?"
 
 conversation_history.append({"role": "user", "content": user_query})
 
@@ -107,5 +107,7 @@ if response_message.tool_calls:
         print(f"Function result: {result}")
     else:
         raise ValueError(f"Function {function_name} not found in function_map")
+else:
+    print(response_message.content)
         
 
