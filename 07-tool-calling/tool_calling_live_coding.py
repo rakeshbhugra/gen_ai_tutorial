@@ -96,7 +96,7 @@ while True:
         tool_choice="auto"
     )
 
-    print("response:", response)
+    # print("response:", response)
     if len(response.choices) == 0:
         exit("No response from the model")
     response_message = response.choices[0].message
