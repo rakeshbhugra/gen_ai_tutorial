@@ -67,10 +67,35 @@ tools = [
     {"type":"function", "function": litellm.utils.function_to_dict(divide_numbers)},
 ]
 
-for tool in tools:
-    print(json.dumps(tool, indent=2))
-    print("-"*40)
+# for tool in tools:
+#     print(json.dumps(tool, indent=2))
+#     print("-"*40)
 
 conversation_history = []
 
-system_prompt = "You are "
+system_prompt = "You are a helpful assistant that can perform basic arithmetic operations like addition, multiplication, and division."
+
+conversation_history.append({"role": "system", "content": system_prompt})
+
+user_query = "What is 25 + 37?"
+
+conversation_history.append({"role": "user", "content": user_query})
+
+response = litellm.completion(
+    model="openai/gpt-4.1-mini",
+    messages=conversation_history,
+    tools=tools,
+    tool_choice="auto"
+)
+
+response_message = response.choices[0].message
+# print(f"Model response: {response_message}")
+
+if response_message.tool_calls:
+    tool_call = response_message.tool_calls[0]
+    function_name = tool_call.function.name
+    function_args = json.loads(tool_call.function.arguments)
+
+    print(f"\nFunction called: {function_name}")
+    print(f"Arguments: {function_args}")
+
