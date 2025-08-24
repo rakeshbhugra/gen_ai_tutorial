@@ -142,17 +142,17 @@ while True:
             "role": "assistant",
             "content": final_response.choices[0].message.content
         })
-        print(f"\nFinal response:\n------\n {final_response.choices[0].message.content}")
+        # print(f"\nFinal response:\n------\n {final_response.choices[0].message.content}")
                 
     else:
         conversation_history.append({
             "role": "assistant",
             "content": response_message.content   
         })
-        print(response_message.content)
+        print("AI:\n",response_message.content)
         
-        # new_input = input("User: ")
-        # conversation_history.append({"role": "user", "content": new_input})
+        new_input = input("User: ")
+        conversation_history.append({"role": "user", "content": new_input})
 
     with open("tool_calling_conversation_history.json", "w") as f:
         json.dump(conversation_history, f, indent=2)
