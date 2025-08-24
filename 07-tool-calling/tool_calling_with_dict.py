@@ -72,6 +72,10 @@ tools = [
     {"type": "function", "function": litellm.utils.function_to_dict(get_current_weather)}
 ]
 
+for tool in tools:
+    print(json.dumps(tool, indent=2))
+    print("-"*40)
+
 # Function mapping for execution
 function_map = {
     "sum_numbers": sum_numbers,

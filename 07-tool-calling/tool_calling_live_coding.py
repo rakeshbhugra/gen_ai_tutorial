@@ -85,8 +85,8 @@ user_query = input("User: ")
 
 conversation_history.append({"role": "user", "content": user_query})
 
-# model = "openai/gpt-4.1-mini"
-model = "gemini/gemini-2.5-flash-lite"
+model = "openai/gpt-4.1-mini"
+# model = "gemini/gemini-2.5-flash-lite"
 
 while True:
     response = litellm.completion(
@@ -98,7 +98,7 @@ while True:
 
     # print("response:", response)
     if len(response.choices) == 0:
-        exit("No response from the model")
+        continue
     response_message = response.choices[0].message
     # print(f"Model response: {response_message}")
 
@@ -133,7 +133,11 @@ while True:
         final_response = litellm.completion(
             model=model,
             messages=conversation_history
-        ) 
+        )
+
+        if len(final_response.choices) == 0:
+            continue
+
         conversation_history.append({
             "role": "assistant",
             "content": final_response.choices[0].message.content
