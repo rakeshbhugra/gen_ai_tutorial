@@ -76,7 +76,7 @@ tools = [
 
 conversation_history = []
 
-system_prompt = "You are a helpful assistant that can perform basic arithmetic operations like addition, multiplication, and division."
+system_prompt = "You are a helpful assistant that can perform basic arithmetic operations like addition, multiplication, and division. Always use these tools to perform calculations"
 
 conversation_history.append({"role": "system", "content": system_prompt})
 
@@ -85,14 +85,20 @@ user_query = input("User: ")
 
 conversation_history.append({"role": "user", "content": user_query})
 
+# model = "openai/gpt-4.1-mini"
+model = "gemini/gemini-2.5-flash-lite"
+
 while True:
     response = litellm.completion(
-        model="openai/gpt-4.1-mini",
+        model=model,
         messages=conversation_history,
         tools=tools,
         tool_choice="auto"
     )
 
+    print("response:", response)
+    if len(response.choices) == 0:
+        exit("No response from the model")
     response_message = response.choices[0].message
     # print(f"Model response: {response_message}")
 
@@ -125,7 +131,7 @@ while True:
                 raise ValueError(f"Function {function_name} not found in function_map")
             
         final_response = litellm.completion(
-            model="openai/gpt-4.1-mini",
+            model=model,
             messages=conversation_history
         ) 
         conversation_history.append({
@@ -140,6 +146,9 @@ while True:
             "content": response_message.content   
         })
         print(response_message.content)
+        
+        # new_input = input("User: ")
+        # conversation_history.append({"role": "user", "content": new_input})
 
     with open("tool_calling_conversation_history.json", "w") as f:
         json.dump(conversation_history, f, indent=2)
