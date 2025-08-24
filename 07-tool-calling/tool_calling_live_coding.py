@@ -80,63 +80,66 @@ system_prompt = "You are a helpful assistant that can perform basic arithmetic o
 
 conversation_history.append({"role": "system", "content": system_prompt})
 
-user_query = "What is 25 + 37 and 30 / 5?"
+user_query = input("User: ")
+# user_query = "Add 5 and 7 then multiply the result by 3."
 
 conversation_history.append({"role": "user", "content": user_query})
 
-response = litellm.completion(
-    model="gemini/gemini-2.5-flash-lite",
-    messages=conversation_history,
-    tools=tools,
-    tool_choice="auto"
-)
+while True:
+    response = litellm.completion(
+        model="openai/gpt-4.1-mini",
+        messages=conversation_history,
+        tools=tools,
+        tool_choice="auto"
+    )
 
-response_message = response.choices[0].message
-# print(f"Model response: {response_message}")
+    response_message = response.choices[0].message
+    # print(f"Model response: {response_message}")
 
-if response_message.tool_calls:
+    if response_message.tool_calls:
 
-    conversation_history.append({
-        "role": "assistant",
-        "content": response_message.content,
-        "tool_calls": response_message.tool_calls
-    })
-    
-    for tool_call in response_message.tool_calls:
-        function_name = tool_call.function.name
-        function_args = json.loads(tool_call.function.arguments)
-
-        # print(f"\nFunction called: {function_name}")
-        # print(f"Arguments: {function_args}")
-
-        if function_name in function_map:
-            result = function_map[function_name](**function_args)
-            # print(f"Function result: {result}")
-
-            conversation_history.append({
-                "role": "tool",
-                "tool_call_id": tool_call.id,
-                "content": str(result)
-            })
-
-        else:
-            raise ValueError(f"Function {function_name} not found in function_map")
+        conversation_history.append({
+            "role": "assistant",
+            "content": response_message.content,
+            "tool_calls": response_message.tool_calls
+        })
         
-    final_response = litellm.completion(
-        model="gemini/gemini-2.5-flash-lite",
-        messages=conversation_history
-    ) 
-    conversation_history.append({
-        "role": "assistant",
-        "content": final_response.choices[0].message.content
-    })
-    print(f"\nFinal response:\n------\n {final_response.choices[0].message.content}")
-            
-else:
-    conversation_history.append({
-        "role": "assistant",
-        "content": response_message.content   
-    })
-    print(response_message.content)
+        for tool_call in response_message.tool_calls:
+            function_name = tool_call.function.name
+            function_args = json.loads(tool_call.function.arguments)
 
-print(json.dumps(conversation_history, indent=2))
+            # print(f"\nFunction called: {function_name}")
+            # print(f"Arguments: {function_args}")
+
+            if function_name in function_map:
+                result = function_map[function_name](**function_args)
+                # print(f"Function result: {result}")
+
+                conversation_history.append({
+                    "role": "tool",
+                    "tool_call_id": tool_call.id,
+                    "content": str(result)
+                })
+
+            else:
+                raise ValueError(f"Function {function_name} not found in function_map")
+            
+        final_response = litellm.completion(
+            model="openai/gpt-4.1-mini",
+            messages=conversation_history
+        ) 
+        conversation_history.append({
+            "role": "assistant",
+            "content": final_response.choices[0].message.content
+        })
+        print(f"\nFinal response:\n------\n {final_response.choices[0].message.content}")
+                
+    else:
+        conversation_history.append({
+            "role": "assistant",
+            "content": response_message.content   
+        })
+        print(response_message.content)
+
+    with open("tool_calling_conversation_history.json", "w") as f:
+        json.dump(conversation_history, f, indent=2)
