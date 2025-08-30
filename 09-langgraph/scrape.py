@@ -64,7 +64,12 @@ builder.add_edge(START, "analyze_sentiment")
 # Add conditional edge
 builder.add_conditional_edges(
     "analyze_sentiment",
-    route_by_sentiment
+    route_by_sentiment,
+    {
+        "positive_node": "positive_node",
+        "negative_node": "negative_node",
+        "neutral_node": "neutral_node"
+    }
 )
 
 
@@ -75,14 +80,14 @@ builder.add_edge("neutral_node", END)
 
 graph = builder.compile()
 
-# # Visualize the graph
-# try:
-#     png_data = graph.get_graph(xray=True).draw_mermaid_png()
-#     with open("conditional_edge_graph.png", "wb") as f:
-#         f.write(png_data)
-#     print("Graph diagram saved as 'conditional_edge_graph.png'")
-# except Exception as e:
-#     print(f"Could not generate graph image: {e}")
+# Visualize the graph
+try:
+    png_data = graph.get_graph(xray=True).draw_mermaid_png()
+    with open("conditional_edge_graph.png", "wb") as f:
+        f.write(png_data)
+    print("Graph diagram saved as 'conditional_edge_graph.png'")
+except Exception as e:
+    print(f"Could not generate graph image: {e}")
 
     
 test_message = "I am having a good day!"
