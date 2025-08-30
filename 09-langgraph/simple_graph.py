@@ -42,4 +42,4 @@ initial_state = State(messages=initial_messages)
 
 result = graph.invoke(initial_state)
 
-print("final_output:", result)
+print(result)

@@ -1,5 +1,11 @@
 from langgraph.graph import START, END, StateGraph
 from pydantic import BaseModel
+from litellm import completion
+from typing import Literal
+import json
+
+class SentimentResponse(BaseModel):
+    sentiment: Literal["positive", "negative", "neutral"]
 
 class State(BaseModel):
     messages: list[dict]
@@ -8,16 +14,18 @@ class State(BaseModel):
 # Define nodes
 def analyze_sentiment(state: State):
     print("Analyzing sentiment...")
-    last_message = state.messages[-1]["content"].lower() 
 
-    if "good" in last_message:
-        state.sentiment = "positive"
+    response = completion(
+        model="openai/gpt-4.1-mini",
+        messages=state.messages,
+        response_format=SentimentResponse
+    )
 
-    elif "bad" in last_message:
-        state.sentiment = "negative"
-    
-    else:
-        state.sentiment = "neutral"
+    json_content = response.choices[0].message.content
+    json_dict = json.loads(json_content)
+    sentiment_respone = SentimentResponse(**json_dict)
+
+    state.sentiment = sentiment_respone.sentiment
 
     return state
 
@@ -90,7 +98,7 @@ except Exception as e:
     print(f"Could not generate graph image: {e}")
 
     
-test_message = "I am having a good day!"
+test_message = "I am not having a good day"
 
 initial_messages = [
     {"role": "user", "content": test_message}
