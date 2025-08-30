@@ -5,3 +5,4 @@ __pycache__/
 .vscode
 .chroma_db
 chroma_db
+tool_calling_conversation_history.json
