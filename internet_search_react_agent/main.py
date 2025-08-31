@@ -1,6 +1,6 @@
 import json
-from internet_search_react_agent.build_graph import build_graph
-from internet_search_react_agent.state import State
+from build_graph import build_graph
+from state import State
 
 graph = build_graph()
 

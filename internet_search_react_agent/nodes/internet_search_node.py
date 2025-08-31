@@ -1,4 +1,4 @@
-from internet_search_react_agent.state import State
+from state import State
 
 def internet_search_node(state: State):
     print("Search node processing...")
