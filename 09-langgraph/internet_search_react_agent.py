@@ -1,5 +1,6 @@
 from langgraph.graph import START, END, StateGraph
 from pydantic import BaseModel
+import json
 
 # State
 class State(BaseModel):
@@ -60,4 +61,16 @@ graph = builder.compile()
 visualize_graph(graph, name="internet_search_react_agent_graph.png")
 
 
-# Run - Invoke
+# Run graph
+# initiate state object
+
+query = "search for me information about LangGraph and its use cases."
+init_messages = [
+    {"role": "user", "content": query}
+]
+
+init_state = State(messages=init_messages)
+
+final_state = graph.invoke(init_state)
+# print("Final state:", final_state)
+print("Pretty print:", json.dumps(final_state, indent=2))
