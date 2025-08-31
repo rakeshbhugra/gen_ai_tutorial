@@ -1,7 +1,10 @@
-from state import State
+from internet_search_react_agent.state import State
+from nodes.chatbot_node import search_internet_tool
+from dotenv import load_dotenv
+load_dotenv()
 
 def internet_search_node(state: State):
     print("Search node processing...")
-    # mock search results
-    state.search_results = "Mock search results for query."
+    result = search_internet_tool(state.search_query)
+    state.search_results = result
     return state

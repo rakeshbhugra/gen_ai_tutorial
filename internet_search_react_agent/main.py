@@ -1,10 +1,13 @@
 import json
 from build_graph import build_graph
 from state import State
+from internet_search_react_agent.nodes.chatbot_node import chatbot_node
 
 graph = build_graph()
 
-query = "find for me information about LangGraph and its use cases."
+# query = "find for me information about LangGraph and its use cases."
+# query = "Hello"
+query = "News"
 init_messages = [
     {"role": "user", "content": query}
 ]
