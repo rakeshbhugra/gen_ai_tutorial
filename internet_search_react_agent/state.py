@@ -6,3 +6,4 @@ class State(BaseModel):
     next_node: str|None  = None
     search_results: str = ""
     search_query: str = ""
+    tool_call_id: str|None = None

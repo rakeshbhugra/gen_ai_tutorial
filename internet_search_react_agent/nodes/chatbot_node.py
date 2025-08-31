@@ -50,14 +50,33 @@ def chatbot_node(state: State):
     if response_message.tool_calls:
         print("Model wants to call a tool...")
         print(f"Tool call: {response_message.tool_calls[0]}")
+        state.messages.append(
+            {
+                "role": "assistant",
+                "content": response_message.content,
+                "tool_calls": response_message.tool_calls
+            }
+        )
         state.next_node = "search"
         tool_call = response_message.tool_calls[0]
+        state.tool_call_id = tool_call.id
         function_args = json.loads(tool_call.function.arguments)
         state.search_query = function_args.get("query")
 
     else:
         # just answer
+        state.messages.append(
+            {
+                "role": "assistant",
+                "content": response_message.content,
+            }
+        )
         state.next_node = END
+        # state.tool_call_id = None
+        # state.search_query = None
+        # state.search_results = None
+        print("Final answer generated.")
+        print(f"AI: {response_message.content}")
         pass
 
     return state

@@ -4,9 +4,9 @@ from state import State
 
 graph = build_graph()
 
-# query = "find for me information about LangGraph and its use cases."
+query = "find me information about LangGraph and its use cases."
 # query = "Hello"
-query = "News"
+# query = "News"
 init_messages = [
     {"role": "user", "content": query}
 ]
@@ -15,4 +15,4 @@ init_state = State(messages=init_messages)
 
 final_state = graph.invoke(init_state)
 # print("Final state:", final_state)
-print("Pretty print:", json.dumps(final_state, indent=2))
+# print("Pretty print:", json.dumps(final_state, indent=2))
