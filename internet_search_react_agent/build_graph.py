@@ -22,6 +22,7 @@ def build_graph():
             END: END
         }
     )
+    builder.add_edge("search", "chatbot")
 
     # compile
     graph = builder.compile()
