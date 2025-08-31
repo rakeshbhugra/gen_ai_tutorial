@@ -4,9 +4,12 @@ from state import State
 
 graph = build_graph()
 
-query = "find me information about LangGraph and its use cases."
+# query = "find me information about LangGraph and its use cases."
 # query = "Hello"
 # query = "News"
+
+query = input("User: ")
+
 init_messages = [
     {"role": "user", "content": query}
 ]
