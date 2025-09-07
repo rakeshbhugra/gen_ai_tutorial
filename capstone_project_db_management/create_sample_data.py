@@ -63,11 +63,11 @@ sample_upload_data = {
 }
 
 df_main = pd.DataFrame(main_db_data)
-df_main.to_excel('database.xlsx', index=False)
+df_main.to_excel('capstone_project_db_management/database.xlsx', index=False)
 print("Created database.xlsx with 20 records")
 
 df_sample = pd.DataFrame(sample_upload_data)
-df_sample.to_excel('sample_upload.xlsx', index=False)
+df_sample.to_excel('capstone_project_db_management/sample_upload.xlsx', index=False)
 print("Created sample_upload.xlsx with 5 records")
 
 print("\nDatabase preview:")

@@ -3,13 +3,7 @@ import pandas as pd
 import os
 from datetime import datetime
 
-st.set_page_config(
-    page_title="Excel Upload Dashboard",
-    page_icon="📊",
-    layout="centered"
-)
-
-DB_FILE = "database.xlsx"
+DB_FILE = "capstone_project_db_management/database.xlsx"
 
 def load_database():
     if os.path.exists(DB_FILE):
@@ -41,60 +35,60 @@ def save_to_database(uploaded_df, filename):
         updated_db.to_excel(DB_FILE, index=False)
         return updated_db, len(uploaded_df), 0
 
-def main():
-    st.title("📊 Excel Upload Dashboard")
-    
-    tab1, tab2 = st.tabs(["📤 Upload Data", "💬 Chat Assistant"])
-    
-    with tab1:
-        st.header("Upload Excel File")
-        
-        uploaded_file = st.file_uploader("Choose an Excel file", type=['xlsx', 'xls'])
-        
-        if uploaded_file is not None:
-            try:
-                df = pd.read_excel(uploaded_file)
-                
-                st.subheader("Preview of uploaded data")
-                st.dataframe(df)
-                
-                col1, col2 = st.columns(2)
-                with col1:
-                    st.metric("Total Rows", len(df))
-                with col2:
-                    st.metric("Total Columns", len(df.columns))
-                
-                if st.button("Save to Database", type="primary"):
-                    updated_db, new_count, duplicate_count = save_to_database(df, uploaded_file.name)
-                    if new_count > 0:
-                        st.success(f"Successfully added {new_count} new records to database!")
-                    if duplicate_count > 0:
-                        st.info(f"Skipped {duplicate_count} duplicate records")
-                    st.info(f"Total records in database: {len(updated_db)}")
-                    
-            except Exception as e:
-                st.error(f"Error reading file: {str(e)}")
-    
-    with tab2:
-        st.header("Chat Assistant")
-        st.info("Chat assistant coming soon! This will help you query and interact with your database.")
-        
-        if "messages" not in st.session_state:
-            st.session_state.messages = []
-        
-        for message in st.session_state.messages:
-            with st.chat_message(message["role"]):
-                st.markdown(message["content"])
-        
-        if prompt := st.chat_input("Ask about your data..."):
-            st.session_state.messages.append({"role": "user", "content": prompt})
-            with st.chat_message("user"):
-                st.markdown(prompt)
-            
-            with st.chat_message("assistant"):
-                response = "Chat functionality will be implemented soon. This will allow you to query your database using natural language."
-                st.markdown(response)
-                st.session_state.messages.append({"role": "assistant", "content": response})
 
+def handle_save_button_click(df, uploaded_file):
+    updated_db, new_count, duplicate_count = save_to_database(df, uploaded_file.name)
+    if new_count > 0:
+        st.success(f"Successfully added {new_count} new records to database!")
+    if duplicate_count > 0:
+        st.info(f"Skipped {duplicate_count} duplicate records")
+    st.info(f"Total records in database: {len(updated_db)}")
+
+def handle_file_upload(uploaded_file):
+    if uploaded_file.name.endswith('.xlsx') or uploaded_file.name.endswith('.xls'):
+        st.subheader("Preview of uploaded file")
+        df = pd.read_excel(uploaded_file)
+        st.dataframe(df)
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Total Rows", len(df))
+        with col2:
+            st.metric("Total Columns", len(df.columns))
+        
+        if st.button("Save to Database", type="primary"):
+            handle_save_button_click(df, uploaded_file)
+    else:
+        st.error("Please upload a valid Excel file (.xlsx or .xls)")
+
+def show_upload_tab():
+    st.header("Upload Data")
+    st.write("This is the upload data tab.")
+
+    uploaded_file = st.file_uploader("Choose a file")
+    if uploaded_file:
+        handle_file_upload(uploaded_file)
+    else:
+        st.info("Awaiting file upload...")
+
+
+def show_chat_tab():
+    st.header("Chat Assistant")
+    st.write("This is the chat assistant tab.")
+
+def main():
+    st.title("Dashboard")
+
+    tab1, tab2 = st.tabs([
+        "Upload Data",
+        "Chat Assistant"
+    ])
+
+    with tab1:
+        show_upload_tab()
+
+    with tab2:
+        show_chat_tab()
+        
 if __name__ == "__main__":
     main()
