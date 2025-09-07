@@ -6,6 +6,7 @@ Customer Support Agent has two tools:
 
 from state import State
 import litellm
+import json
 
 def search_knowledge_base(query: str) -> str:
     """
@@ -77,7 +78,7 @@ def customer_support_agent_node(state: State):
     )
 
     response_message = response.choices[0].message
-    print(f"Response Message: {response_message}")
+    # print(f"Response Message: {response_message}")
 
     if response_message.tool_calls:
         state.messages.append(
@@ -88,13 +89,21 @@ def customer_support_agent_node(state: State):
             }
         )
 
-        if response_message.tool_calls[0]['name'] == 'search_knowledge_base':
+        tool_call = response_message.tool_calls[0]
+        # print(f"Tool Call: {tool_call}")
+        tool_name = tool_call.function.name
+        tool_args = tool_call.function.arguments
+        json_args = json.loads(tool_args)
+        if tool_name == 'search_knowledge_base':
             state.next_node = "customer_support_rag"
-        elif response_message.tool_calls[0]['name'] == 'send_email':
+            state.search_query = json_args.get("query")
+
+        elif tool_name == 'send_email':
             state.next_node = "send_email"
+            state.email_to = json_args.get("to")
+            state.email_subject = json_args.get("subject")
+            state.email_body = json_args.get("body")
     else:
         raise ValueError("No tool call made by the model.")
     
-    
-    state.next_node = "send_email"
     return state
