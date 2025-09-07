@@ -12,7 +12,7 @@ from state import State
 
 # visualize_graph(graph, "email_classifier_graph.png")
 
-user_query = "Can you help me with logging into my account?"
+user_query = "What is the process for handling customer complaints?"
 
 init_messages = [
     {"role": "user", "content": user_query},

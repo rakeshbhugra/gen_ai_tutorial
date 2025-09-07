@@ -8,3 +8,4 @@ class State(BaseModel):
     email_to: str | None = None
     email_subject: str | None = None
     email_body: str | None = None
+    tool_call_id: str | None = None

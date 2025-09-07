@@ -90,10 +90,11 @@ def customer_support_agent_node(state: State):
         )
 
         tool_call = response_message.tool_calls[0]
-        # print(f"Tool Call: {tool_call}")
+        print(f"Tool Call: {tool_call}")
         tool_name = tool_call.function.name
         tool_args = tool_call.function.arguments
         json_args = json.loads(tool_args)
+        state.tool_call_id = tool_call.id
         if tool_name == 'search_knowledge_base':
             state.next_node = "customer_support_rag"
             state.search_query = json_args.get("query")
