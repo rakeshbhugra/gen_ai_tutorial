@@ -44,33 +44,57 @@ def save_to_database(uploaded_df, filename):
 def main():
     st.title("📊 Excel Upload Dashboard")
     
-    st.header("Upload Excel File")
+    tab1, tab2 = st.tabs(["📤 Upload Data", "💬 Chat Assistant"])
     
-    uploaded_file = st.file_uploader("Choose an Excel file", type=['xlsx', 'xls'])
-    
-    if uploaded_file is not None:
-        try:
-            df = pd.read_excel(uploaded_file)
-            
-            st.subheader("Preview of uploaded data")
-            st.dataframe(df)
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                st.metric("Total Rows", len(df))
-            with col2:
-                st.metric("Total Columns", len(df.columns))
-            
-            if st.button("Save to Database", type="primary"):
-                updated_db, new_count, duplicate_count = save_to_database(df, uploaded_file.name)
-                if new_count > 0:
-                    st.success(f"Successfully added {new_count} new records to database!")
-                if duplicate_count > 0:
-                    st.info(f"Skipped {duplicate_count} duplicate records")
-                st.info(f"Total records in database: {len(updated_db)}")
+    with tab1:
+        st.header("Upload Excel File")
+        
+        uploaded_file = st.file_uploader("Choose an Excel file", type=['xlsx', 'xls'])
+        
+        if uploaded_file is not None:
+            try:
+                df = pd.read_excel(uploaded_file)
                 
-        except Exception as e:
-            st.error(f"Error reading file: {str(e)}")
+                st.subheader("Preview of uploaded data")
+                st.dataframe(df)
+                
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.metric("Total Rows", len(df))
+                with col2:
+                    st.metric("Total Columns", len(df.columns))
+                
+                if st.button("Save to Database", type="primary"):
+                    updated_db, new_count, duplicate_count = save_to_database(df, uploaded_file.name)
+                    if new_count > 0:
+                        st.success(f"Successfully added {new_count} new records to database!")
+                    if duplicate_count > 0:
+                        st.info(f"Skipped {duplicate_count} duplicate records")
+                    st.info(f"Total records in database: {len(updated_db)}")
+                    
+            except Exception as e:
+                st.error(f"Error reading file: {str(e)}")
+    
+    with tab2:
+        st.header("Chat Assistant")
+        st.info("Chat assistant coming soon! This will help you query and interact with your database.")
+        
+        if "messages" not in st.session_state:
+            st.session_state.messages = []
+        
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
+        
+        if prompt := st.chat_input("Ask about your data..."):
+            st.session_state.messages.append({"role": "user", "content": prompt})
+            with st.chat_message("user"):
+                st.markdown(prompt)
+            
+            with st.chat_message("assistant"):
+                response = "Chat functionality will be implemented soon. This will allow you to query your database using natural language."
+                st.markdown(response)
+                st.session_state.messages.append({"role": "assistant", "content": response})
 
 if __name__ == "__main__":
     main()
