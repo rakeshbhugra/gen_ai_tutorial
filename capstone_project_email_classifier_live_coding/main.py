@@ -2,6 +2,7 @@
 # create a graph
 # create edges
 # visualize the graph (optional)
+# modularize the code
 # fill in the functions with mock logic to test the flow
 # fill in the functions with actual logic
 
