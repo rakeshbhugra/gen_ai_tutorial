@@ -8,3 +8,5 @@ class State(BaseModel):
         "sales",
         "human_in_the_loop"
         ] | None = None
+
+    next_node: str | None = None
