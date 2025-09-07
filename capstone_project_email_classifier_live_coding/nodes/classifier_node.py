@@ -12,10 +12,30 @@ def classifier_node(state: State):
 
     # use LLM to classify the email into one of the categories
     # customer_support, sales, human_in_the_loop
+    system_prompt = """
+    You are an email classification model. Classify the user's email into one of the following categories:
+    1. customer_support
+    2. sales
+    3. human_in_the_loop (if the email is ambiguous and you cannot determine if it's customer_support or sales)
+    
+    example email: "I need help with my order."
+    classification: customer_support
+    
+    example email: "Can you provide more information about your product pricing?"
+    classification: sales
+    
+    example email: "hello, I have a question."
+    classification: human_in_the_loop
+    """
+
+    messages_for_llm = [
+        {"role": "system", "content": system_prompt},
+        *state.messages
+    ]
 
     response = completion(
         model = "openai/gpt-4.1-mini",
-        messages = state.messages,
+        messages = messages_for_llm,
         response_format=EmailClassification
     )
 
