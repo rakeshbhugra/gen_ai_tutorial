@@ -5,3 +5,5 @@ litellm
 chromadb
 python-docx
 google-generativeai
+langchain-community
+google-search-results
