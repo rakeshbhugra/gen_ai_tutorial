@@ -3,7 +3,13 @@ import streamlit as st
 def upload_tab():
     st.header("Upload Data")
     st.write("This is the upload data tab.")
-    st.file_uploader("Upload your file here")
+    uploaded_file = st.file_uploader("Upload your file here")
+     
+    if uploaded_file:
+        st.success("File uploaded successfully!")
+        st.write(f"Filename: {uploaded_file.name}")
+    else:
+        st.info("Awaiting file upload...")
 
 def chat_tab():
     st.header("Chat Assistant")
@@ -23,7 +29,6 @@ def main():
 
     with tab2:
         chat_tab()
-    # st.file_uploader("Upload your file here")
 
 if __name__ == "__main__":
     main()
