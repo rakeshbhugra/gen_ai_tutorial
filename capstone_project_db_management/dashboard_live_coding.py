@@ -1,6 +1,9 @@
 import streamlit as st
 import pandas as pd
 
+def handle_save_button_click(df, uploaded_file):
+    st.success("File saved to database (simulated)")
+
 def handle_file_upload(uploaded_file):
     # check file name
     if uploaded_file.name.endswith('.xlsx') or uploaded_file.name.endswith('.xls'):
@@ -8,7 +11,8 @@ def handle_file_upload(uploaded_file):
         st.subheader("Preview of uploaded file")
         st.dataframe(df)
         if st.button("Save to Database", type="primary"):
-            st.success("File saved to database (simulated)")
+            handle_save_button_click(df, uploaded_file)
+            
     else:
         st.error("Please upload a valid Excel file (.xlsx or .xls)")
         return
