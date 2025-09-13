@@ -8,3 +8,4 @@ chroma_db
 tool_calling_conversation_history.json
 conditional_edge_graph.png
 react_agent_graph.png
+app.log
