@@ -1,8 +1,37 @@
 import streamlit as st
 import pandas as pd
+from data_validation_live_coding import DataFrameValidator
+
+def save_to_database(uploaded_df, filename):
+    try:
+        main_df_path = "capstone_project_db_management/database.xlsx"
+
+        main_df = pd.read_excel(main_df_path)
+
+        updated_df = pd.concat([main_df, uploaded_df])
+
+        # write to excel file
+        updated_df.to_excel(main_df_path, index=False)
+
+        st.success(f"File '{filename}' saved to database successfully!")
+
+    except:
+        st.error("Error saving to database. Ensure the database file exists and is accessible.")
+
 
 def handle_save_button_click(df, uploaded_file):
-    st.success("File saved to database (simulated)")
+    validator = DataFrameValidator()
+
+    try:
+        validator.validate(df)
+        st.success(f"File '{uploaded_file.name}' validated successfully!")
+
+        save_to_database(df, uploaded_file.name)
+        
+    except ValueError as ve:
+        st.error(f"Validation Error: {str(ve)}")
+        return
+    
 
 def handle_file_upload(uploaded_file):
     # check file name
