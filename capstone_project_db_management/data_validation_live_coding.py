@@ -48,6 +48,7 @@ class DataFrameValidator:
         # check each row, if it matches the customer record schema
         for idx, row in  dataframe.iterrows():
             try:
+                # write your own validation if you want to
                 CustomerRecord(**row.to_dict())
             except Exception as e:
                 raise ValueError(f"Row {idx} validation error: {str(e)}")
