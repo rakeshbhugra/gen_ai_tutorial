@@ -1,5 +1,3 @@
-import sys
-sys.path.append('..')
 from state import State
 
 def route_by_classification(state: State):
