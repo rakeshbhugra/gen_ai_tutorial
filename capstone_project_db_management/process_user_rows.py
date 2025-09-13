@@ -21,6 +21,22 @@
 
 
 import pandas as pd
+from email_agent.email_helper import EmailHelper
+
+def update_status_in_db(customer_id, new_status):
+    print(f"Updating customer {customer_id} to status {new_status}")
+    
+    file_path = "capstone_project_db_management/database.xlsx"
+    df = pd.read_excel(file_path)
+
+    df.loc[df['Customer ID'] == customer_id, 'User Status'] = new_status
+
+    # write updated file back to excel sheet
+
+    df.to_excel(file_path, index=False)
+
+    print("Updated Tag")
+    return
 
 def triggering_unprocessed_flow():
     print("triggering unprocessed flow")
@@ -28,9 +44,23 @@ def triggering_unprocessed_flow():
 def triggering_reminder_flow():
     print("triggering reminder flow")
 
-def notifying_human():
-    print("notifying human")
+def notifying_human(customer_name, customer_id, amount_due, email, phone):
+    # send email to human that this user needs attention
+    receiver = "rakeshkbhugra@gmail.com"
 
+    subject = f"Customer {customer_name} needs attention"
+
+    body = f"""
+    Customer {customer_name} with ID {customer_id} has an amount due of {amount_due}.
+    Please reach out to them at email: {email} or phone: {phone}.
+    """
+    
+    email_helper = EmailHelper()
+    email_helper.send_email(to_email=receiver, subject=subject, body=body)
+
+    # update tag to "notified_human"
+    update_status_in_db(customer_id, "notified_human")
+    
 if __name__ == "__main__":
     file_path = "capstone_project_db_management/database.xlsx"
     df = pd.read_excel(file_path)
@@ -50,7 +80,13 @@ if __name__ == "__main__":
             triggering_reminder_flow()
 
         elif user_status == "followed_up":
-            notifying_human()
+            notifying_human(
+                row["Customer Name"], 
+                row["Customer ID"], 
+                row["Amount Due"], 
+                row["Email"], 
+                row["Phone"]
+            )
 
 
         else:

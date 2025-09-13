@@ -11,7 +11,7 @@ class CustomerRecord(BaseModel):
     service_type: str = Field(..., alias='Service Type')
     amount_due: float = Field(..., alias='Amount Due', gt=0)
     due_date: str = Field(..., alias='Due Date')
-    user_status: Literal["unprocessed", "followed_up", "reminded"] = Field(..., alias='User Status')
+    user_status: Literal["unprocessed", "followed_up", "reminded", "notified_human"] = Field(..., alias='User Status')
     last_contact: str = Field(..., alias='Last Contact')
     payment_status: str = Field(..., alias='Payment Status')
     follow_up_required: str = Field(..., alias='Follow Up Required')
