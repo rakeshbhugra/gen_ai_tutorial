@@ -7,6 +7,8 @@ def handle_file_upload(uploaded_file):
         df = pd.read_excel(uploaded_file)
         st.subheader("Preview of uploaded file")
         st.dataframe(df)
+        if st.button("Save to Database", type="primary"):
+            st.success("File saved to database (simulated)")
     else:
         st.error("Please upload a valid Excel file (.xlsx or .xls)")
         return
