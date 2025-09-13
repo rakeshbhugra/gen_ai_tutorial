@@ -2,7 +2,7 @@ from state import State
 from vector_search_helper.query_chroma_db import search_documents
 
 def customer_support_rag_node(state: State):
-    print("Routing to Customer Support RAG...")
+    print("Doing Customer Support RAG...")
     # mock routing logic
     search_query = state.search_query
 
