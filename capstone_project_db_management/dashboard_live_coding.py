@@ -1,9 +1,12 @@
 import streamlit as st
+import pandas as pd
 
 def handle_file_upload(uploaded_file):
     # check file name
     if uploaded_file.name.endswith('.xlsx') or uploaded_file.name.endswith('.xls'):
-        st.write("File is a valid Excel file.")
+        df = pd.read_excel(uploaded_file)
+        st.subheader("Preview of uploaded file")
+        st.dataframe(df)
     else:
         st.error("Please upload a valid Excel file (.xlsx or .xls)")
         return
@@ -15,8 +18,6 @@ def upload_tab():
      
     if uploaded_file:
         handle_file_upload(uploaded_file)
-        # st.success("File uploaded successfully!")
-        # st.write(f"Filename: {uploaded_file.name}")
     else:
         st.info("Awaiting file upload...")
 
