@@ -1,13 +1,22 @@
 import streamlit as st
 
+def handle_file_upload(uploaded_file):
+    # check file name
+    if uploaded_file.name.endswith('.xlsx') or uploaded_file.name.endswith('.xls'):
+        st.write("File is a valid Excel file.")
+    else:
+        st.error("Please upload a valid Excel file (.xlsx or .xls)")
+        return
+
 def upload_tab():
     st.header("Upload Data")
     st.write("This is the upload data tab.")
     uploaded_file = st.file_uploader("Upload your file here")
      
     if uploaded_file:
-        st.success("File uploaded successfully!")
-        st.write(f"Filename: {uploaded_file.name}")
+        handle_file_upload(uploaded_file)
+        # st.success("File uploaded successfully!")
+        # st.write(f"Filename: {uploaded_file.name}")
     else:
         st.info("Awaiting file upload...")
 
