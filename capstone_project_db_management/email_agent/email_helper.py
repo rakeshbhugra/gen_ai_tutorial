@@ -276,3 +276,14 @@ class EmailHelper:
             criteria = criteria_parts[0] if criteria_parts else 'ALL'
         
         return self.read_emails(folder=folder, search_criteria=criteria)
+
+if __name__ == "__main__":
+    # Example usage
+    email_helper = EmailHelper()
+    
+    # Send a test email
+    email_helper.send_email(
+        to_email="rakeshkbhugra@gmail.com",
+        subject="Test Email",
+        body="This is a test email."
+    )
