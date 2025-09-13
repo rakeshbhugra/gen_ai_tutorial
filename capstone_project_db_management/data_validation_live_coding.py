@@ -56,7 +56,8 @@ class DataFrameValidator:
         return dataframe
 
 if __name__ == "__main__":
-    df = pd.read_excel("capstone_project_db_management/sample_upload.xlsx") 
+    file_path = "capstone_project_db_management/sample_upload.xlsx"
+    df = pd.read_excel(file_path) 
 
     validator = DataFrameValidator()
 
