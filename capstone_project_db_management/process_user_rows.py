@@ -49,6 +49,21 @@ def generate_payment_link(customer_id, amount_due):
     # Dummy payment link generation
     return f"https://payment-portal.com/pay?customer_id={customer_id}&amount={amount_due}"
 
+def create_voice_agent_prompt(
+    customer_name,
+    customer_id,
+    amount_due,
+    email,
+    phone,
+):
+    prompt = f"""
+    You are a voice agent that will call the customer {customer_name} at phone number {phone} to remind them about their pending payment of {amount_due}. 
+    Introduce yourself as a representative of the company and politely ask them to make the payment. 
+    If they have any questions, inform them that a human representative will follow up with them via email at {email}.
+    """
+    return prompt
+
+
 def triggering_unprocessed_flow(    
     customer_name,
     customer_id,
@@ -89,13 +104,63 @@ def triggering_unprocessed_flow(
     )
     
     # Prepare Prompt for Voice Agent
+    voice_agent_prompt = create_voice_agent_prompt(
+        customer_name,
+        customer_id,
+        amount_due,
+        email,
+        phone
+    )
+
     # Trigger Voice Agent call
 
     # update tag to "reminded"
     update_status_in_db(customer_id, "reminded")
 
-def triggering_reminder_flow():
+def triggering_reminder_flow(
+    customer_name,
+    customer_id,
+    amount_due,
+    email,
+    phone,
+):
     print("triggering reminder flow")
+    # prepare follow up email
+    messages = [
+        { "role": "system", "content": "You are a helpful assistant that drafts follow-up emails. Always respond with valid JSON." },
+        { "role": "user", "content": f"Draft a follow-up email for the payment reminder. User {customer_name} has an outstanding amount of {amount_due}. Please reach out to them at email: {email} or phone: {phone}." }
+    ]
+   
+    response = completion(
+        model = "gpt-4.1-mini",
+        messages = messages,
+        response_format = EmailResponse
+    )
+
+    parsed_data = json.loads(response.choices[0].message.content)
+    email_content = EmailResponse(**parsed_data)
+    print("email_content:", email_content)
+    
+    # send follow up email
+    email_helper = EmailHelper()
+    email_helper.send_email(
+        to_email="rakeshkbhugra@gmail.com",
+        subject=email_content.subject,
+        body=email_content.body
+    )
+
+    # prepare prompt for voice agent
+    voice_agent_prompt = create_voice_agent_prompt(
+        customer_name,
+        customer_id,
+        amount_due,
+        email,
+        phone
+    )
+
+    # update tag to "followed_up"
+
+    update_status_in_db(customer_id, "followed_up")
 
 def notifying_human(
     customer_name,
