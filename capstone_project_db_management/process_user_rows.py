@@ -89,6 +89,9 @@ if __name__ == "__main__":
             )
 
 
+        elif user_status == "notified_human":
+            print("Human already notified, waiting for action")
+
         else:
             raise ValueError(f"Unknown user status: {user_status}")
 
