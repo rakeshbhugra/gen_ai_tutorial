@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import os
 from datetime import datetime
+from data_validation import validate_upload
 
 DB_FILE = "capstone_project_db_management/database.xlsx"
 
@@ -37,12 +38,35 @@ def save_to_database(uploaded_df, filename):
 
 
 def handle_save_button_click(df, uploaded_file):
-    updated_db, new_count, duplicate_count = save_to_database(df, uploaded_file.name)
-    if new_count > 0:
-        st.success(f"Successfully added {new_count} new records to database!")
-    if duplicate_count > 0:
-        st.info(f"Skipped {duplicate_count} duplicate records")
-    st.info(f"Total records in database: {len(updated_db)}")
+    # Validate the data first
+    is_valid, valid_df, validation_message = validate_upload(df)
+    
+    if not is_valid:
+        st.error(f"❌ {validation_message}")
+        return
+    
+    if valid_df.empty:
+        st.warning("No valid records to save after validation")
+        return
+    
+    # Show validation results
+    if len(valid_df) < len(df):
+        st.warning(f"⚠️ {len(df) - len(valid_df)} records failed validation and will be skipped")
+        with st.expander("View validation details"):
+            st.write(validation_message)
+    else:
+        st.success(f"✅ All {len(valid_df)} records passed validation")
+    
+    # Proceed with saving valid records
+    try:
+        updated_db, new_count, duplicate_count = save_to_database(valid_df, uploaded_file.name)
+        if new_count > 0:
+            st.success(f"Successfully added {new_count} new records to database!")
+        if duplicate_count > 0:
+            st.info(f"Skipped {duplicate_count} duplicate records")
+        st.info(f"Total records in database: {len(updated_db)}")
+    except Exception as e:
+        st.error(f"Error saving to database: {str(e)}")
 
 def handle_file_upload(uploaded_file):
     if uploaded_file.name.endswith('.xlsx') or uploaded_file.name.endswith('.xls'):
