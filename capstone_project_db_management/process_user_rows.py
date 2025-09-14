@@ -207,7 +207,13 @@ if __name__ == "__main__":
             )
 
         elif user_status == "reminded":
-            triggering_reminder_flow()
+            triggering_reminder_flow(
+                row["Customer Name"], 
+                row["Customer ID"], 
+                row["Amount Due"], 
+                row["Email"], 
+                row["Phone"]
+            )
 
         elif user_status == "followed_up":
             notifying_human(
