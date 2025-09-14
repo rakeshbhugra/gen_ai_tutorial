@@ -1,5 +1,7 @@
 import subprocess
 from litellm import completion
+from dotenv import load_dotenv
+load_dotenv()
 
 messages = [
     {"role": "user", "content": "Write a pandas script to print head of this file path: capstone_project_db_management/sample_upload.xlsx, Just write python code and nothing else"},
