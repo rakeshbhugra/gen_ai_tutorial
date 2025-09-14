@@ -24,7 +24,11 @@ import pandas as pd
 from email_agent.email_helper import EmailHelper
 from pydantic import BaseModel
 from litellm import completion
+from retell import Retell
 import json
+import asyncio
+from dotenv import load_dotenv
+import os
 
 class EmailResponse(BaseModel):
     subject: str
@@ -49,19 +53,29 @@ def generate_payment_link(customer_id, amount_due):
     # Dummy payment link generation
     return f"https://payment-portal.com/pay?customer_id={customer_id}&amount={amount_due}"
 
-def create_voice_agent_prompt(
-    customer_name,
-    customer_id,
-    amount_due,
-    email,
-    phone,
-):
-    prompt = f"""
-    You are a voice agent that will call the customer {customer_name} at phone number {phone} to remind them about their pending payment of {amount_due}. 
-    Introduce yourself as a representative of the company and politely ask them to make the payment. 
-    If they have any questions, inform them that a human representative will follow up with them via email at {email}.
-    """
-    return prompt
+
+load_dotenv()
+
+retell_client = Retell(
+  api_key=os.getenv("RETELL_API_KEY")
+)
+
+from_number = '+13322448167'
+to_number = '+919588078815'
+
+async def make_call(name, amount_due):
+    try:
+        response = await retell_client.call.create_phone_call(
+            from_number=from_number,
+            to_number=to_number,
+            retell_llm_dynamic_variables={
+                "name": str(name),
+                "amount": str(amount_due)
+            }
+        )
+        print(f"Call initiated: {response}")
+    except Exception as e:
+        print(f"Error making call: {e}")
 
 
 def triggering_unprocessed_flow(    
@@ -103,16 +117,12 @@ def triggering_unprocessed_flow(
         body=email_content.body
     )
     
-    # Prepare Prompt for Voice Agent
-    voice_agent_prompt = create_voice_agent_prompt(
-        customer_name,
-        customer_id,
-        amount_due,
-        email,
-        phone
-    )
-
     # Trigger Voice Agent call
+    try:
+        asyncio.run(make_call(customer_name, amount_due))
+    except Exception as e:
+        print(f"Error in making call: {e}")
+    exit()
 
     # update tag to "reminded"
     update_status_in_db(customer_id, "reminded")
@@ -148,18 +158,11 @@ def triggering_reminder_flow(
         subject=email_content.subject,
         body=email_content.body
     )
-
-    # prepare prompt for voice agent
-    voice_agent_prompt = create_voice_agent_prompt(
-        customer_name,
-        customer_id,
-        amount_due,
-        email,
-        phone
-    )
-
+    
+    asyncio.run(make_call(customer_name, amount_due))
+    exit()
+    
     # update tag to "followed_up"
-
     update_status_in_db(customer_id, "followed_up")
 
 def notifying_human(
