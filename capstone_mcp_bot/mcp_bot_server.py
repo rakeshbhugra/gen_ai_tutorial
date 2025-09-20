@@ -4,7 +4,7 @@ from pandas_react_agent import pandas_agent
 mcp = FastMCP("MCP Bot Server")
 
 @mcp.tool()
-def talk_to_excel(query: str) -> str:
+def analytics_team(query: str) -> str:
     """Query the Excel file using natural language
     
     Parameters
@@ -21,7 +21,7 @@ def talk_to_excel(query: str) -> str:
 
 
 @mcp.tool()
-def send_email(to: str, subject: str, body: str) -> str:
+def email_team(to: str, subject: str, body: str) -> str:
     """Send an email (simulated)
     
     Parameters
