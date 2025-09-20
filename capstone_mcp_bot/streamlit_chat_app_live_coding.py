@@ -1,4 +1,15 @@
-import streamlit as st  
+import streamlit as st
+from litellm import completion
+from dotenv import load_dotenv
+
+def get_response(messages: list[dict]) -> str:
+    model = 'openai/gpt-4.1-mini'
+    response = completion(
+        model=model,
+        messages=messages,
+    )
+
+    return response.choices[0].message['content']
 
 def main():
     st.set_page_config(
@@ -31,8 +42,7 @@ def main():
             st.markdown(prompt)
 
         with st.chat_message("assistant"):
-            # echo the user response
-            response = f"echo: {prompt}"
+            response = get_response(st.session_state.messages)
             st.markdown(response)
 
         st.session_state.messages.append({"role": "assistant", "content": response})
