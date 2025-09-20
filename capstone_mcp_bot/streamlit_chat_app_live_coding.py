@@ -1,6 +1,7 @@
 import streamlit as st
 from litellm import completion
 from dotenv import load_dotenv
+load_dotenv()
 
 def get_response(messages: list[dict]) -> str:
     model = 'openai/gpt-4.1-mini'
