@@ -1,13 +1,24 @@
 import streamlit as st
+import litellm
 from litellm import completion
 from dotenv import load_dotenv
 load_dotenv()
+
+litellm.success_callback = ["langfuse"]
+litellm.failure_callback = ["langfuse"] # logs errors to langfuse
 
 def get_response(messages: list[dict]) -> str:
     model = 'openai/gpt-4.1-mini'
     response = completion(
         model=model,
         messages=messages,
+        metadata = {
+            "trace_user_id": "rakesh_bhugra_001",
+            "session_id": "mcp_bot_session_002",
+            "tags":[
+                "agent2",
+            ]
+        }
     )
 
     return response.choices[0].message['content']
