@@ -26,8 +26,9 @@ async def get_bot_response(messages):
             await session.initialize()
             
             tools = await load_mcp_tools(session=session)
-            # print("MCP Tools:", tools)
+            print("MCP Tools:", tools)
 
+            # Supervisor
             agent = create_react_agent(
                 model="openai:gpt-4.1-mini",
                 tools=tools,
@@ -50,6 +51,8 @@ async def get_bot_response(messages):
 
 if __name__ == "__main__":
     print("Connecting to MCP server...")
-    query = "What is the total, average, min and max amount due across all customers?"
+    # query = "What is the total, average, min and max amount due across all customers?"
+    query = "Who is the top borrower?"
+    # query = "Send email to manager@example.com that I am running late for the meeting."
     asyncio.run(get_bot_response(query))
     print("Connection closed.")
